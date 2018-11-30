@@ -1,0 +1,20 @@
+[Unit]
+Description=Bitcoin Core for OzbCore
+Requires=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/opt/ozbcore
+ExecStart=/usr/bin/ozbcore-bitcoind -datadir=/home/ozbcore/.ozbcore/data/
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=15
+User=ozbcore
+ExecStartPre=/bin/mkdir -p /run/ozbcore
+ExecStartPre=/bin/chown ozbcore:ozbcore /run/ozbcore
+ExecStartPre=/bin/chmod 755 /run/ozbcore
+PermissionsStartOnly=true
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target

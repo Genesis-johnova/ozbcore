@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+# add group
+if ! getent group | grep -q "^ozbcore:" ; then
+    echo "Creating system group: ozbcore"
+    groupadd --system ozbcore
+fi
+
+# add user
+if ! getent passwd | grep -q "^ozbcore:"; then
+    echo "Creating ozbcore system user"
+    useradd --gid "ozbcore" --system -m ozbcore
+fi
+
+# build nodejs addons
+cd "/usr/opt/ozbcore"
+SKIP_BITCOIN_DOWNLOAD=1 npm rebuild
+
+# setup data directory
+mkdir -p "/home/ozbcore/.ozbcore/data"
+chown -R ozbcore:ozbcore "/home/ozbcore/.ozbcore"
+
+# start ozbcore
+if hash service 2> /dev/null; then
+    service ozbcore start || echo "ozbcore could not be registered or started"
+elif hash start 2> /dev/null; then
+    start ozbcore || echo "ozbcore could not be registered or started"
+elif hash systemctl 2> /dev/null; then
+    {
+        systemctl enable "ozbcore.service" && \
+            systemctl start "ozbcore.service"
+    } || echo "ozbcore could not be registered or started"
+else
+    echo 'Your system does not appear to use upstart or systemd, so ozbcore could not be started'
+fi

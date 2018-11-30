@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+if hash service 2> /dev/null; then
+    service ozbcore stop || echo "ozbcore wasn't running!"
+elif hash stop 2> /dev/null; then
+    stop "$service_name" || echo "ozbcore wasn't running!"
+elif hash systemctl 2> /dev/null; then
+    systemctl disable "ozbcore.service" || echo "ozbcore wasn't running!"
+else
+    echo "Your system does not appear to use upstart or systemd, so ozbcore could not be stopped"
+fi

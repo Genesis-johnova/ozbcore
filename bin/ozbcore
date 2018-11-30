@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+var ozbcore = require('ozbcore-node/lib/cli/bitcore');
+var path = require('path');
+var servicesPath = path.resolve(__dirname, '../');
+var additionalServices = ['ozbinsight-api', 'ozbinsight-ui'];
+ozbcore(servicesPath, additionalServices);
